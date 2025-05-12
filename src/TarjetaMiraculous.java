@@ -1,3 +1,4 @@
+
 public class TarjetaMiraculous extends Tarjeta {
     private String nombre; //Para mostrarlo nomás
     private String kwami;

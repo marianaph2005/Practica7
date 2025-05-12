@@ -1,3 +1,4 @@
+
 public abstract class Tarjeta {
     protected String tipo;
     protected boolean descubierta;
@@ -34,6 +35,11 @@ public abstract class Tarjeta {
     //Para cuando se encuentre un par se quede descubierta
     public void descubir() {
         descubierta = true;
+    }
+
+    public void reiniciar() {
+        descubierta = false;
+        estaVolteada = false;
     }
 
     @Override

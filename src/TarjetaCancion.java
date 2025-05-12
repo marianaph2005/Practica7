@@ -1,3 +1,4 @@
+
 public class TarjetaCancion extends Tarjeta {
     private String nombreCancion; //Solo para mostrarlo
     private String album; // Álbums: Lover, TTPD, Speak Now

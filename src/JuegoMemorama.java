@@ -1,3 +1,4 @@
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -107,9 +108,10 @@ public class JuegoMemorama {
 
     public boolean seleccionarTarjeta(int indice) {
         Tarjeta tarjeta = tarjetas.get(indice);
-        if (tarjeta.estaDescubierta()) {
+        if (tarjeta.estaDescubierta() || tarjeta.estaVolteada()) {
             return false;
         }
+        tarjeta.voltear();
 
         if (primeraSeleccion == null) {
             primeraSeleccion = tarjeta;
@@ -121,8 +123,12 @@ public class JuegoMemorama {
                 tarjeta.descubir();
                 getJugadorActual().sumarPunto(); // Punto
             }
+            else {
+                primeraSeleccion.voltear();
+                tarjeta.voltear();
+                cambiarTurno();
+            }
             primeraSeleccion = null;
-            if (!esPar) cambiarTurno(); // Solo cambia si no hizo par
             return esPar;
         }
     }
