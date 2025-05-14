@@ -1,3 +1,4 @@
+
 public abstract class Tarjeta {
     protected String tipo;
     protected boolean descubierta;
@@ -8,7 +9,6 @@ public abstract class Tarjeta {
         descubierta = false;
         estaVolteada = false;
     }
-
     public boolean estaDescubierta() {
         return descubierta;
     }

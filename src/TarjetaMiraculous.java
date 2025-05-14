@@ -1,10 +1,11 @@
-public class TarjetaHeroe extends Tarjeta {
+
+public class TarjetaMiraculous extends Tarjeta {
     private String nombre; //Para mostrarlo nomás
     private String kwami;
     private boolean esHeroe;
 
-    public TarjetaHeroe(String nombre,String kwami, boolean esHeroe) {
-        super("héroe");
+    public TarjetaMiraculous(String nombre, String kwami, boolean esHeroe) {
+        super("miraculous");
         this.nombre = nombre;
         this.kwami = kwami;
         this.esHeroe = esHeroe;
@@ -21,7 +22,7 @@ public class TarjetaHeroe extends Tarjeta {
 
     @Override
     public boolean esParCon(Tarjeta otraTarjeta) {
-        TarjetaHeroe otroHeroe= (TarjetaHeroe) otraTarjeta;
+        TarjetaMiraculous otroHeroe= (TarjetaMiraculous) otraTarjeta;
         //Si tienen el mismo kwami y uno es héroe y el otro no
         return this.kwami.equals(otroHeroe.kwami) && (this.esHeroe != otroHeroe.esHeroe);    }
 }

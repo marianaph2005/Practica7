@@ -1,3 +1,4 @@
+
 public class TarjetaPelicula extends Tarjeta{
     private String nombre; //Para mostrarlo
     private String genero; //Romance, Terror, Animada

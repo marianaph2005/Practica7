@@ -9,10 +9,18 @@ public class Jugador {
         this.paresEncontrados = 0;
     }
 
-    //Actualizar puntos y pares
+    // Actualizar puntos y pares
     public void sumarPunto() {
         puntos++;
         paresEncontrados++;
+    }
+
+    public void setPuntos(int puntos) {
+        this.puntos = puntos;
+    }
+
+    public void setParesEncontrados(int pares) {
+        this.paresEncontrados = pares;
     }
 
     public String getNombre() {
