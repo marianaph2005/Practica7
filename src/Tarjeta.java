@@ -36,6 +36,22 @@ public abstract class Tarjeta {
         descubierta = true;
     }
 
+    public void reiniciar() {
+        descubierta = false;
+        estaVolteada = false;
+    }
+
+    // Este método se llama cuando la tarjeta se voltea
+    public void efectoAlVoltear(VentanaJuego ventana, BotonTarjeta boton) {
+        //Las subclases lo sobrescriben
+    }
+
+    // Este método se llama cuando la tarjeta forma un par
+    public void efectoAlFormarPar(VentanaJuego ventana, Tarjeta otraTarjeta,
+                                  BotonTarjeta botonEsta, BotonTarjeta botonOtra) {
+        //Las subclases lo sobrescriben
+    }
+
     @Override
     public String toString() {
         return "Tarjeta tipo: " + tipo + ", descubierta: " + descubierta;

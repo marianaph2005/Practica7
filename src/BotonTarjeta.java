@@ -9,6 +9,8 @@ public class BotonTarjeta extends JButton {
     public static final int ANCHO_BOTON = 120;
     public static final int ALTO_BOTON = 180;
 
+    private VentanaJuego ventana;
+
     static {
         ImageIcon img = null;
         try {
@@ -40,8 +42,9 @@ public class BotonTarjeta extends JButton {
         IMAGEN_REVERSO = img;
     }
 
-    public BotonTarjeta(Tarjeta tarjeta, ActionListener accion) {
+    public BotonTarjeta(Tarjeta tarjeta, ActionListener accion, VentanaJuego ventana) {
         this.tarjeta = tarjeta;
+        this.ventana = ventana;
 
         this.setPreferredSize(new Dimension(ANCHO_BOTON, ALTO_BOTON));
         this.setMinimumSize(new Dimension(ANCHO_BOTON, ALTO_BOTON));
@@ -66,7 +69,7 @@ public class BotonTarjeta extends JButton {
 
     private ImageIcon cargarImagen(Tarjeta tarjeta) {
         try {
-            String ruta = "G:\\4toSemestre\\POO\\Practica-7\\src\\";
+            String ruta = "G:\\4toSemestre\\POO\\Practica-7\\src\\imagenes\\";
             String tipo = tarjeta.getTipo();
 
             if (tipo.equals("canción")) {

@@ -42,19 +42,16 @@ public class JuegoMemorama {
             case "canción":
                 // Pares: Mismo álbum
                 agregarParCancion("Enchanted", ALBUMES[0]);
-                agregarParCancion("Last Kiss", ALBUMES[0]);
                 agregarParCancion("Foolish One", ALBUMES[0]);
-                agregarParCancion("I Can See You", ALBUMES[0]);
+                //agregarParCancion("I Can See You", ALBUMES[0]);
 
-                agregarParCancion("But Daddy I Love Him", ALBUMES[1]);
                 agregarParCancion("The Prophecy", ALBUMES[1]);
                 agregarParCancion("So High School", ALBUMES[1]);
-                agregarParCancion("Guilty as Sin?", ALBUMES[1]);
+                //agregarParCancion("Guilty as Sin?", ALBUMES[1]);
 
                 agregarParCancion("London Boy", ALBUMES[2]);
                 agregarParCancion("Paper Rings", ALBUMES[2]);
-                agregarParCancion("False God", ALBUMES[2]);
-                agregarParCancion("I Think He Knows", ALBUMES[2]);
+               // agregarParCancion("I Think He Knows", ALBUMES[2]);
                 break;
 
             case "película":
@@ -79,6 +76,8 @@ public class JuegoMemorama {
     }
 
     private void agregarParCancion(String nombre, String album) {
+//Agregar 2 veces para que formar un par
+        tarjetas.add(new TarjetaCancion(nombre, album));
         tarjetas.add(new TarjetaCancion(nombre, album));
     }
 
