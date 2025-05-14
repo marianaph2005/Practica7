@@ -1,4 +1,3 @@
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,17 +21,20 @@ public class JuegoMemorama {
         }
 
         this.jugadorActual = 0;
+        this.primeraSeleccion = null;
         inicializarTarjetas();
     }
 
     private void inicializarTarjetas() {
+        tarjetas.clear(); // Limpiar las tarjetas antes de inicializarlas nuevamente
+
         switch (tipoTarjetas) {
             case "miraculous":
                 // Pares: Héroe + Kwami
                 agregarParMiraculous("Ladybug", "Tikki");
                 agregarParMiraculous("Chat Noir", "Plagg");
                 agregarParMiraculous("Viperion", "Sass");
-                agregarParMiraculous("Flairmidable", "Bark");
+                agregarParMiraculous("Flairmidable", "Barkk");
                 agregarParMiraculous("Tigresa", "Roarr");
                 agregarParMiraculous("Bunnix", "Fluff");
                 break;
@@ -89,7 +91,6 @@ public class JuegoMemorama {
         tarjetas.add(new TarjetaMiraculous(heroe, kwami, false)); // Kwami
     }
 
-
     public List<Tarjeta> getTarjetas() {
         return tarjetas;
     }
@@ -108,28 +109,43 @@ public class JuegoMemorama {
 
     public boolean seleccionarTarjeta(int indice) {
         Tarjeta tarjeta = tarjetas.get(indice);
+
+        // Verificar si la tarjeta ya está descubierta o volteada
         if (tarjeta.estaDescubierta() || tarjeta.estaVolteada()) {
             return false;
         }
+
+        // Voltear la tarjeta
         tarjeta.voltear();
 
+        // Si es la primera selección, guardarla y esperar
         if (primeraSeleccion == null) {
             primeraSeleccion = tarjeta;
-            return true;
+            return false; // No se forma par aún
         } else {
             boolean esPar = primeraSeleccion.esParCon(tarjeta);
             if (esPar) {
                 primeraSeleccion.descubir();
                 tarjeta.descubir();
-                getJugadorActual().sumarPunto(); // Punto
-            }
-            else {
-                primeraSeleccion.voltear();
-                tarjeta.voltear();
+
+                // Dar puntos al jugador actual
+                getJugadorActual().sumarPunto();
+            } else {
+                // Solo cambiamos el turno
                 cambiarTurno();
             }
+
+            // Resetear la primera selección
             primeraSeleccion = null;
             return esPar;
+        }
+    }
+
+    public void voltearTarjetasNoDescubiertas() {
+        for (Tarjeta t : tarjetas) {
+            if (t.estaVolteada() && !t.estaDescubierta()) {
+                t.voltear();
+            }
         }
     }
 }

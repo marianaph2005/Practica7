@@ -9,7 +9,6 @@ public abstract class Tarjeta {
         descubierta = false;
         estaVolteada = false;
     }
-
     public boolean estaDescubierta() {
         return descubierta;
     }
@@ -35,11 +34,6 @@ public abstract class Tarjeta {
     //Para cuando se encuentre un par se quede descubierta
     public void descubir() {
         descubierta = true;
-    }
-
-    public void reiniciar() {
-        descubierta = false;
-        estaVolteada = false;
     }
 
     @Override
