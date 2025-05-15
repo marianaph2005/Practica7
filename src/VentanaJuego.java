@@ -260,4 +260,8 @@ public class VentanaJuego extends JFrame {
     public int getPuntosParaGanar() {
         return puntosParaGanar;
     }
+
+    public JuegoMemorama getJuegoActual() {
+        return juegoActual;
+    }
 }

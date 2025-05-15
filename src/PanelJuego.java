@@ -78,7 +78,7 @@ public class PanelJuego extends JPanel {
                 public void actionPerformed(ActionEvent e) {
                     manejarClickTarjeta(indice);
                 }
-            });
+            },ventana);
             botones.add(boton);
             panelTarjetas.add(boton);
         }
@@ -92,6 +92,7 @@ public class PanelJuego extends JPanel {
         if (esperando) return;
 
         Tarjeta tarjeta = juego.getTarjetas().get(indice);
+        BotonTarjeta boton = botones.get(indice);
 
         // Si ya está descubierta o volteada, no se hace nada
         if (tarjeta.estaDescubierta() || tarjeta.estaVolteada()) {
@@ -104,14 +105,40 @@ public class PanelJuego extends JPanel {
         // Actualizar visualmente todas las tarjetas
         actualizarBotones();
 
+        // Después de actualizar visualmente, ejecutar el efecto al voltear
+        if (tarjeta.estaVolteada()) {
+            tarjeta.efectoAlVoltear(ventana, boton);
+        }
+
         // Actualizar información de jugadores
         actualizarInformacion();
+
+        // Si formó un par se activa el efecto especial
+        if (esPar) {
+            // Buscar la otra tarjeta del par (la que ya estaba volteada)
+            Tarjeta otraTarjeta = null;
+            BotonTarjeta otroBoton = null;
+
+            for (int i = 0; i < juego.getTarjetas().size(); i++) {
+                Tarjeta t = juego.getTarjetas().get(i);
+                if (t != tarjeta && t.estaDescubierta() && t.estaVolteada()) {
+                    otraTarjeta = t;
+                    otroBoton = botones.get(i);
+                    break;
+                }
+            }
+
+            // Activar el efecto especial al formar par
+            if (otraTarjeta != null) {
+                tarjeta.efectoAlFormarPar(ventana, otraTarjeta, boton, otroBoton);
+            }
+        }
 
         // Si no formó par, esperar y voltear las tarjetas
         if (!esPar && contarTarjetasVolteadas() == 2) {
             esperando = true;
 
-            Timer timer = new Timer(1000, new ActionListener() {
+            Timer timer = new Timer(3000, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     // Usar el método de JuegoMemorama para voltear tarjetas
