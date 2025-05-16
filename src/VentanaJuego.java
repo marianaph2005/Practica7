@@ -7,7 +7,6 @@ import java.util.List;
 
 public class VentanaJuego extends JFrame {
     private JuegoMemorama juegoActual;
-    private int puntosParaGanar;
     private String tipoTarjetasActual;
 
     // Componentes de la pantalla de inicio
@@ -16,6 +15,7 @@ public class VentanaJuego extends JFrame {
 
     // Componentes del juego
     private PanelJuego panelJuego;
+    private JLabel fondoLabel;
 
     public VentanaJuego() {
         setTitle("Memorama");
@@ -31,65 +31,109 @@ public class VentanaJuego extends JFrame {
         // Limpiar el contenido anterior si existe
         getContentPane().removeAll();
 
-        // Configurar el panel principal
-        JPanel panelMenu = new JPanel();
-        panelMenu.setLayout(new BoxLayout(panelMenu, BoxLayout.Y_AXIS));
-        panelMenu.setBackground(new Color(230, 220, 250));
+        // Usar JLayeredPane para manejar capas
+        JLayeredPane layeredPane = new JLayeredPane();
+        layeredPane.setPreferredSize(new Dimension(1000, 800));
+
+        // 1. Configurar el fondo (capa más baja)
+        try {
+            ImageIcon fondoIcon = new ImageIcon("G:\\4toSemestre\\POO\\Practica-7\\src\\imagenMenu.jpg");
+            Image imgRedimensionada = fondoIcon.getImage().getScaledInstance(1000, 800, Image.SCALE_SMOOTH);
+            fondoIcon = new ImageIcon(imgRedimensionada);
+            fondoLabel = new JLabel(fondoIcon);
+            fondoLabel.setBounds(0, 0, 1000, 800);
+            layeredPane.add(fondoLabel, JLayeredPane.DEFAULT_LAYER);
+        } catch (Exception e) {
+            System.err.println("Error al cargar la imagen de fondo: " + e.getMessage());
+            fondoLabel = new JLabel();
+            fondoLabel.setBackground(new Color(230, 220, 250));
+            fondoLabel.setOpaque(true);
+            fondoLabel.setBounds(0, 0, 1000, 800);
+            layeredPane.add(fondoLabel, JLayeredPane.DEFAULT_LAYER);
+        }
+
+        // 2. Panel de elementos (capa superior)
+        JPanel panelElementos = new JPanel();
+        panelElementos.setLayout(new BoxLayout(panelElementos, BoxLayout.Y_AXIS));
+        panelElementos.setOpaque(false);
+        panelElementos.setBounds(0, 100, 1000, 800);
 
         // Título
         JLabel tituloLabel = new JLabel("✧ MEMORAMA ✧");
         tituloLabel.setFont(new Font("Serif", Font.BOLD, 48));
-        tituloLabel.setForeground(new Color(100, 50, 150));
+        tituloLabel.setForeground(new Color(255, 255, 255));
+        tituloLabel.setBackground(new Color(100, 50, 150));
         tituloLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panelMenu.add(Box.createVerticalStrut(40));
-        panelMenu.add(tituloLabel);
-
-        // Imagen
-        ImageIcon icono = new ImageIcon("ruta/a/tu/imagen.png");
-        try {
-            Image imagen = icono.getImage();
-            Image nuevaImagen = imagen.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
-            icono = new ImageIcon(nuevaImagen);
-        } catch (Exception e) {
-            System.out.println("No se pudo cargar la imagen: " + e.getMessage());
-            // Crear una imagen vacía si no se encuentra
-            icono = new ImageIcon(new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB));
-        }
-
-        JLabel etiquetaImagen = new JLabel(icono);
-        etiquetaImagen.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panelMenu.add(Box.createVerticalStrut(20));
-        panelMenu.add(etiquetaImagen);
+        tituloLabel.setOpaque(true);
+        panelElementos.add(Box.createVerticalStrut(100));
+        panelElementos.add(tituloLabel);
+        panelElementos.add(Box.createVerticalStrut(40));
 
         // Botón de jugar
         botonJugar = new JButton("Jugar");
-        botonJugar.setAlignmentX(Component.CENTER_ALIGNMENT);
-        botonJugar.setMaximumSize(new Dimension(200, 40));
-        botonJugar.setFont(new Font("Arial", Font.BOLD, 16));
-        panelMenu.add(Box.createVerticalStrut(30));
-        panelMenu.add(botonJugar);
+        estiloBoton(botonJugar);
+        panelElementos.add(botonJugar);
+        panelElementos.add(Box.createVerticalStrut(20));
 
         // Botón de salir
         botonSalir = new JButton("Salir");
-        botonSalir.setAlignmentX(Component.CENTER_ALIGNMENT);
-        botonSalir.setMaximumSize(new Dimension(200, 40));
-        botonSalir.setFont(new Font("Arial", Font.BOLD, 16));
-        panelMenu.add(Box.createVerticalStrut(10));
-        panelMenu.add(botonSalir);
+        estiloBoton(botonSalir);
+        panelElementos.add(botonSalir);
 
         // Configurar acciones de botones
         botonSalir.addActionListener(e -> System.exit(0));
         botonJugar.addActionListener(e -> inicializarConfiguracionJuego());
 
-        // Agregar el panel al frame
-        getContentPane().add(panelMenu, BorderLayout.CENTER);
+        // Agregar panel de elementos a la capa superior
+        layeredPane.add(panelElementos, JLayeredPane.PALETTE_LAYER);
+
+        // Centrar los elementos verticalmente
+        panelElementos.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+        // Configurar el contenido
+        getContentPane().add(layeredPane, BorderLayout.CENTER);
+
+        // Actualizar la ventana
         revalidate();
         repaint();
         setVisible(true);
     }
 
+    private void estiloBoton(JButton boton) {
+        boton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        boton.setMaximumSize(new Dimension(200, 60));
+        boton.setFont(new Font("Arial", Font.BOLD, 20));
+        boton.setBackground(new Color(100, 50, 150));
+        boton.setForeground(Color.WHITE);
+        boton.setFocusPainted(false);
+        boton.setBorder(BorderFactory.createRaisedBevelBorder());
+
+        // Efecto hover
+        boton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                boton.setBackground(new Color(140, 80, 200));
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                boton.setBackground(new Color(100, 50, 150));
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                boton.setBackground(new Color(80, 40, 120));
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                boton.setBackground(new Color(100, 50, 150));
+            }
+        });
+    }
+
     public void inicializarConfiguracionJuego() {
-        //Seleccionar número de jugadores
+        // Seleccionar número de jugadores
         int numeroDeJugadores = 0;
         while (numeroDeJugadores < 2 || numeroDeJugadores > 4) {
             String input = JOptionPane.showInputDialog(this,
@@ -114,32 +158,6 @@ public class VentanaJuego extends JFrame {
             }
         }
 
-        //Seleccionar puntos para ganar
-        int puntosParaGanar = 0;
-        while (puntosParaGanar < 1) {
-            String input = JOptionPane.showInputDialog(this,
-                    "¿Cuántos puntos para ganar? (Mínimo 1):",
-                    "Puntos para Ganar", JOptionPane.QUESTION_MESSAGE);
-
-            if (input == null) {
-                return; // Se canceló
-            }
-
-            try {
-                puntosParaGanar = Integer.parseInt(input);
-                if (puntosParaGanar < 1) {
-                    JOptionPane.showMessageDialog(this,
-                            "Por favor ingrese un número mayor a 0",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this,
-                        "Por favor ingrese un número válido",
-                        "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        }
-        this.puntosParaGanar = puntosParaGanar;
-
         // Seleccionar tipo de tarjetas
         Object[] opciones = {"Canción", "Película", "Miraculous"};
         int opcion = JOptionPane.showOptionDialog(this,
@@ -159,7 +177,7 @@ public class VentanaJuego extends JFrame {
         String[] tiposTarjetas = {"canción", "película", "miraculous"};
         this.tipoTarjetasActual = tiposTarjetas[opcion];
 
-        //Pedir nombres de los jugadores
+        // Pedir nombres de los jugadores
         List<String> nombresJugadores = new ArrayList<>();
         for (int i = 1; i <= numeroDeJugadores; i++) {
             String nombre = JOptionPane.showInputDialog(this,
@@ -174,8 +192,8 @@ public class VentanaJuego extends JFrame {
             nombresJugadores.add(nombre);
         }
 
-        // Iniciar el juego
-        iniciarJuego(puntosParaGanar, tipoTarjetasActual, nombresJugadores);
+        // Iniciar el juego - Establecemos el puntaje para ganar a un número alto que no se alcanzará
+        iniciarJuego(1000, tipoTarjetasActual, nombresJugadores); // 1000 es un valor que nunca se alcanzará
     }
 
     public void iniciarJuego(int puntosParaGanar, String tipoTarjetas, List<String> nombresJugadores) {
@@ -197,22 +215,23 @@ public class VentanaJuego extends JFrame {
     }
 
     public void finalizarJuego(Jugador ganador) {
-        Timer timer = new Timer(100, new ActionListener() {
+        Timer timer = new Timer(300, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Mostrar mensaje de ganador
-                JOptionPane.showMessageDialog(VentanaJuego.this,
+                // Mostrar mensaje de ganador con efecto visual
+                JOptionPane pane = new JOptionPane(
                         "¡" + ganador.getNombre() + " ha ganado con " + ganador.getPuntos() + " puntos!",
-                        "¡Juego Terminado!",
-                        JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.INFORMATION_MESSAGE,
+                        JOptionPane.DEFAULT_OPTION,
+                        null,
+                        new Object[]{"Jugar de nuevo", "Salir"}
+                );
 
-                // Preguntar si quieren jugar de nuevo
-                int opcion = JOptionPane.showConfirmDialog(VentanaJuego.this,
-                        "¿Quieren jugar de nuevo?",
-                        "Nueva Partida",
-                        JOptionPane.YES_NO_OPTION);
+                JDialog dialog = pane.createDialog(VentanaJuego.this, "¡Juego Terminado!");
+                dialog.setVisible(true);
 
-                if (opcion == JOptionPane.YES_OPTION) {
+                Object seleccionado = pane.getValue();
+                if (seleccionado != null && seleccionado.equals("Jugar de nuevo")) {
                     iniciarMenuPrincipal();
                 } else {
                     System.exit(0);
@@ -255,13 +274,5 @@ public class VentanaJuego extends JFrame {
 
         revalidate();
         repaint();
-    }
-
-    public int getPuntosParaGanar() {
-        return puntosParaGanar;
-    }
-
-    public JuegoMemorama getJuegoActual() {
-        return juegoActual;
     }
 }

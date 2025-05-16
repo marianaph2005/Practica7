@@ -101,8 +101,7 @@ public class BotonTarjeta extends JButton {
 
             // Escalar la imagen
             Image imgEscalada = iconoOriginal.getImage().getScaledInstance(
-                    newWidth, newHeight, Image.SCALE_SMOOTH
-            );
+                    newWidth, newHeight, Image.SCALE_SMOOTH);
             return new ImageIcon(imgEscalada);
         } catch (Exception e) {
             System.err.println("Error al cargar la imagen: " + e.getMessage());
@@ -110,17 +109,23 @@ public class BotonTarjeta extends JButton {
         }
     }
 
-
     private String modificarNombre(String original) {
         return original.toLowerCase().replace(" ", "").
                 replace("'", "").replace("?", "");
     }
 
     public void actualizarImagen() {
-        if (tarjeta.estaDescubierta() || tarjeta.estaVolteada()) {
+        if (tarjeta.estaDescubierta()) {
+            setIcon(imagenFrontal);
+            setEnabled(false); // Asegurarse que se desactiva
+        } else if (tarjeta.estaVolteada()) {
             setIcon(imagenFrontal);
         } else {
             setIcon(IMAGEN_REVERSO);
         }
+    }
+
+    public Tarjeta getTarjeta() {
+        return tarjeta;
     }
 }
