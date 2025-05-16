@@ -12,6 +12,8 @@ public class Jugador {
     // Actualizar puntos y pares
     public void sumarPunto() {
         puntos++;
+    }
+    public void sumarParesEncontrados() {
         paresEncontrados++;
     }
 

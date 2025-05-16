@@ -51,7 +51,7 @@ public class JuegoMemorama {
 
                 agregarParCancion("London Boy", ALBUMES[2]);
                 agregarParCancion("Paper Rings", ALBUMES[2]);
-               // agregarParCancion("I Think He Knows", ALBUMES[2]);
+                // agregarParCancion("I Think He Knows", ALBUMES[2]);
                 break;
 
             case "película":
@@ -76,7 +76,7 @@ public class JuegoMemorama {
     }
 
     private void agregarParCancion(String nombre, String album) {
-//Agregar 2 veces para que formar un par
+        // Agregar 2 veces para que formar un par
         tarjetas.add(new TarjetaCancion(nombre, album));
         tarjetas.add(new TarjetaCancion(nombre, album));
     }
@@ -124,11 +124,17 @@ public class JuegoMemorama {
         } else {
             boolean esPar = primeraSeleccion.esParCon(tarjeta);
             if (esPar) {
+                // Marcar ambas tarjetas como descubiertas
                 primeraSeleccion.descubir();
                 tarjeta.descubir();
 
                 // Dar puntos al jugador actual
                 getJugadorActual().sumarPunto();
+                getJugadorActual().sumarParesEncontrados();
+                if(tarjeta instanceof TarjetaMiraculous){
+                    // Si las tarjetas son de tipo miraculous se suman 2 puntos
+                    getJugadorActual().sumarPunto();
+                }
             } else {
                 // Solo cambiamos el turno
                 cambiarTurno();
@@ -146,5 +152,9 @@ public class JuegoMemorama {
                 t.voltear();
             }
         }
+    }
+
+    public String getTipoTarjetas(){
+        return tipoTarjetas;
     }
 }

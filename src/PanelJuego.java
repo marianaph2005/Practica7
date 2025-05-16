@@ -13,6 +13,8 @@ public class PanelJuego extends JPanel {
     private JLabel lblJugadorActual;
     private List<JLabel> etiquetasPuntos;
     private boolean esperando = false;
+    private Tarjeta ultimaTarjetaSeleccionada = null;
+    private BotonTarjeta ultimoBotonSeleccionado = null;
 
     public PanelJuego(JuegoMemorama juego, VentanaJuego ventana) {
         this.juego = juego;
@@ -62,6 +64,33 @@ public class PanelJuego extends JPanel {
         }
 
         panelInfo.add(panelPuntuaciones);
+        // Panel inferior con botones de control
+        JPanel panelBotonesInferiores = new JPanel();
+        panelBotonesInferiores.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        panelBotonesInferiores.setBackground(new Color(230, 230, 250));
+
+        JButton btnMenu = new JButton("Menú Principal");
+        btnMenu.setFont(new Font("Arial", Font.BOLD, 14));
+        btnMenu.addActionListener(e -> {
+            int opcion = JOptionPane.showConfirmDialog(
+                    this,
+                    "¿Estás seguro de que quieres regresar al menú?\nSe perderá el progreso actual.",
+                    "Confirmar",
+                    JOptionPane.YES_NO_OPTION
+            );
+            if (opcion == JOptionPane.YES_OPTION) {
+                ventana.iniciarMenuPrincipal();
+            }
+        });
+
+        JButton btnInstrucciones = new JButton("Instrucciones");
+        btnInstrucciones.setFont(new Font("Arial", Font.BOLD, 14));
+        btnInstrucciones.addActionListener(e -> mostrarInstrucciones());
+
+        panelBotonesInferiores.add(btnMenu);
+        panelBotonesInferiores.add(btnInstrucciones);
+
+        add(panelBotonesInferiores, BorderLayout.SOUTH);
 
         // Panel de tarjetas
         panelTarjetas = new JPanel();
@@ -78,7 +107,7 @@ public class PanelJuego extends JPanel {
                 public void actionPerformed(ActionEvent e) {
                     manejarClickTarjeta(indice);
                 }
-            },ventana);
+            }, ventana);
             botones.add(boton);
             panelTarjetas.add(boton);
         }
@@ -87,6 +116,40 @@ public class PanelJuego extends JPanel {
         add(panelInfo, BorderLayout.NORTH);
         add(panelTarjetas, BorderLayout.CENTER);
     }
+    private void mostrarInstrucciones() {
+        String tipo = juego.getTipoTarjetas().toLowerCase();
+        String mensaje = "";
+
+        switch (tipo) {
+            case "canción":
+                mensaje = "🎵 Encuentra las tarjetas con la misma canción para formar un par!!\n"
+                        + "Al voltear una tarjeta escucharás un pequeño fragmento de esta canción\n"
+                        +"para ayudarte a recordarlas, y al formar un par escucharás el nombre " +
+                        "del álbum.\n" + "¡¡Junta la mayor cantidad de pares posibles para ganar!!";
+                break;
+            case "película":
+                mensaje = "🎬 Une las películas del mismo género (romance, terror, animada).\n"
+                        + "Al voltear la tarjeta escucharás los efectos de sonido y se observará\n" +
+                        "una pequeña guía de colores para ayudarte a encontrar los pares, y al formar " +
+                        "un par\nte sorpenderás con los efectos visuales personalizados para cada género" +
+                        "\n ¡¡Junta la mayor cantidad de pares posibles para ganar!!";
+                break;
+            case "miraculous":
+                mensaje = "🐞 Encuentra pares de tarjeta relacionando al superhéroe con su kwami.\n"
+                        + "Por ejemplo: LadyBug y Tikki, Chat noir y plagg.\n Al voltear una tarjeta" +
+                        "se revelará la identidad de cada héroe y el miraculous(objeto)\n de cada kwami," +
+                        " debido a esto, en este modo de juego se otorgan puntos dobles!!\n Y al formar" +
+                        " un par, verás cómo se conectan las tarjetas entre sí. \n ¡¡Junta la mayor cantidad " +
+                        "de pares posibles para ganar!!";
+                break;
+            default:
+                mensaje = "🤔 Las instrucciones específicas no están disponibles para este tipo de tarjetas.";
+                break;
+        }
+
+        JOptionPane.showMessageDialog(this, mensaje, "Instrucciones", JOptionPane.INFORMATION_MESSAGE);
+    }
+
 
     private void manejarClickTarjeta(int indice) {
         if (esperando) return;
@@ -97,6 +160,16 @@ public class PanelJuego extends JPanel {
         // Si ya está descubierta o volteada, no se hace nada
         if (tarjeta.estaDescubierta() || tarjeta.estaVolteada()) {
             return;
+        }
+
+        // Guardar referencia a la última tarjeta seleccionada
+        if (ultimaTarjetaSeleccionada == null) {
+            ultimaTarjetaSeleccionada = tarjeta;
+            ultimoBotonSeleccionado = boton;
+        } else {
+            // Reiniciar para la próxima selección
+            ultimaTarjetaSeleccionada = null;
+            ultimoBotonSeleccionado = null;
         }
 
         // Seleccionar tarjeta en el juego
@@ -121,7 +194,7 @@ public class PanelJuego extends JPanel {
 
             for (int i = 0; i < juego.getTarjetas().size(); i++) {
                 Tarjeta t = juego.getTarjetas().get(i);
-                if (t != tarjeta && t.estaDescubierta() && t.estaVolteada()) {
+                if (t != tarjeta && t.estaDescubierta() && tarjeta.esParCon(t)) {
                     otraTarjeta = t;
                     otroBoton = botones.get(i);
                     break;
@@ -129,8 +202,22 @@ public class PanelJuego extends JPanel {
             }
 
             // Activar el efecto especial al formar par
-            if (otraTarjeta != null) {
-                tarjeta.efectoAlFormarPar(ventana, otraTarjeta, boton, otroBoton);
+            if (otraTarjeta != null && otroBoton != null) {
+                final Tarjeta tarjetaFinal = tarjeta;
+                final Tarjeta otraTarjetaFinal = otraTarjeta;
+                final BotonTarjeta botonFinal = boton;
+                final BotonTarjeta otroBotonFinal = otroBoton;
+
+                // Desactivar botones inmediatamente
+                botonFinal.setEnabled(false);
+                otroBotonFinal.setEnabled(false);
+
+                // Usar un pequeño delay para que los efectos se muestren correctamente
+                Timer timerEfecto = new Timer(200, e -> {
+                    tarjetaFinal.efectoAlFormarPar(ventana, otraTarjetaFinal, botonFinal, otroBotonFinal);
+                });
+                timerEfecto.setRepeats(false);
+                timerEfecto.start();
             }
         }
 
@@ -138,7 +225,7 @@ public class PanelJuego extends JPanel {
         if (!esPar && contarTarjetasVolteadas() == 2) {
             esperando = true;
 
-            Timer timer = new Timer(3000, new ActionListener() {
+            Timer timer = new Timer(1500, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     // Usar el método de JuegoMemorama para voltear tarjetas
@@ -176,7 +263,6 @@ public class PanelJuego extends JPanel {
         return count;
     }
 
-
     private void actualizarInformacion() {
         lblJugadorActual.setText("Turno de: " + juego.getJugadorActual().getNombre());
 
@@ -187,14 +273,6 @@ public class PanelJuego extends JPanel {
     }
 
     private void verificarFinJuego() {
-        // Verificar si alguien alcanzó los puntos para ganar
-        for (Jugador jugador : juego.getJugadores()) {
-            if (jugador.getPuntos() >= ventana.getPuntosParaGanar()) {
-                ventana.finalizarJuego(jugador);
-                return;
-            }
-        }
-
         // Verificar si se descubrieron todas las tarjetas
         boolean todasDescubiertas = true;
         for (Tarjeta tarjeta : juego.getTarjetas()) {
@@ -210,38 +288,43 @@ public class PanelJuego extends JPanel {
     }
 
     private void preguntarContinuarJuego() {
-        int opcion = JOptionPane.showConfirmDialog(
-                this,
-                "¡Se acabaron las tarjetas! ¿Quieren continuar con otro tipo de tarjetas?",
-                "Continuar Juego",
-                JOptionPane.YES_NO_OPTION
-        );
-
-        if (opcion == JOptionPane.YES_OPTION) {
-            //Elegir nuevo tipo de tarjetas
-            Object[] tiposDisponibles = {"Canción", "Película", "Miraculous"};
-            int seleccion = JOptionPane.showOptionDialog(
+        // Pequeño retraso para que los efectos visuales terminen
+        Timer timer = new Timer(500, e -> {
+            int opcion = JOptionPane.showConfirmDialog(
                     this,
-                    "Seleccione el nuevo tipo de tarjetas:",
-                    "Nuevas Tarjetas",
-                    JOptionPane.DEFAULT_OPTION,
-                    JOptionPane.QUESTION_MESSAGE,
-                    null,
-                    tiposDisponibles,
-                    tiposDisponibles[0]
+                    "¡Se acabaron las tarjetas! ¿Quieren continuar con otro tipo de tarjetas?",
+                    "Continuar Juego",
+                    JOptionPane.YES_NO_OPTION
             );
 
-            if (seleccion != JOptionPane.CLOSED_OPTION) {
-                String[] tiposTarjetas = {"canción", "película", "miraculous"};
-                String nuevoTipo = tiposTarjetas[seleccion];
-                ventana.continuarJuegoNuevasTarjetas(nuevoTipo);
+            if (opcion == JOptionPane.YES_OPTION) {
+                // Elegir nuevo tipo de tarjetas
+                Object[] tiposDisponibles = {"Canción", "Película", "Miraculous"};
+                int seleccion = JOptionPane.showOptionDialog(
+                        this,
+                        "Seleccione el nuevo tipo de tarjetas:",
+                        "Nuevas Tarjetas",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        tiposDisponibles,
+                        tiposDisponibles[0]
+                );
+
+                if (seleccion != JOptionPane.CLOSED_OPTION) {
+                    String[] tiposTarjetas = {"canción", "película", "miraculous"};
+                    String nuevoTipo = tiposTarjetas[seleccion];
+                    ventana.continuarJuegoNuevasTarjetas(nuevoTipo);
+                } else {
+                    determinarGanador();
+                }
             } else {
+                // No continuar, se determina el ganador
                 determinarGanador();
             }
-        } else {
-            // No continuar, se determina el ganador
-            determinarGanador();
-        }
+        });
+        timer.setRepeats(false);
+        timer.start();
     }
 
     private void determinarGanador() {
@@ -267,6 +350,7 @@ public class PanelJuego extends JPanel {
                     "¡El juego terminó en empate!",
                     "Fin del Juego",
                     JOptionPane.INFORMATION_MESSAGE);
+            ventana.iniciarMenuPrincipal();
         } else {
             ventana.finalizarJuego(ganador);
         }
